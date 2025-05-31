@@ -6,9 +6,10 @@ package window;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 import database.db_connection;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -93,23 +94,45 @@ public class login extends javax.swing.JFrame {
         try {
             String username = usernameField.getText();
             String userpass = userpassField.getText();
-            
-            String query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + userpass + "'";
-            Connection conn = (Connection)db_connection.configuration_db();
-            Statement s = conn.createStatement();
-            ResultSet r = s.executeQuery(query);
-            
-            if(r.next()) {
-                JOptionPane.showMessageDialog(null, "Berhasil Login!");
-                dashboard dashboardWindow = new dashboard();
-                dashboardWindow.setVisible(true);
-                this.setVisible(false);
+
+            String query = "SELECT * FROM users WHERE name = ?";
+            Connection conn = db_connection.configuration_db();
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, username);
+            ResultSet r = ps.executeQuery();
+
+            if (r.next()) {
+                // Ambil hashed password dari DB
+                String hashedPassword = r.getString("password");
+                String correctedHash = hashedPassword.replaceFirst("^\\$2y\\$", "\\$2a\\$");
+
+                // tanpa hash
+//                if (r.getString("password").equals(userpass)) {
+//                    JOptionPane.showMessageDialog(null, "Berhasil Login!");
+//                    dashboard dashboardWindow = new dashboard();
+//                    dashboardWindow.setVisible(true);
+//                    this.setVisible(false);
+//                }
+                
+                if (BCrypt.checkpw(userpass, correctedHash)) {
+                    if (r.getString("role").equals("admin")) {
+                        JOptionPane.showMessageDialog(null, "Berhasil Login!");
+                        dashboard dashboardWindow = new dashboard();
+                        dashboardWindow.setVisible(true);
+                        this.setVisible(false);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hanya untuk admin!");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Password salah!");
+                }
             } else {
-                JOptionPane.showMessageDialog(null, "Gagal Login!");
+                JOptionPane.showMessageDialog(null, "Username tidak ditemukan!");
             }
-            
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+
+            conn.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_loginButtonActionPerformed
 
