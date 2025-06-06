@@ -96,7 +96,7 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
-        StudioMenu SM = new StudioMenu();
+        StudioMenu1 SM = new StudioMenu1();
         screen.add(SM);
         SM.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
