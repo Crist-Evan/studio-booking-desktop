@@ -218,7 +218,7 @@ public class studioMenu extends javax.swing.JInternalFrame {
         String location = locationTextArea.getText();
         String status = statusComboBox.getSelectedItem().toString();
         
-        if(name.equals("") || price.equals("") || desc.equals("") || location.equals("")) {
+        if(name.equals("") || price.equals("")) {
             JOptionPane.showMessageDialog(null, "Data Tidak Boleh Kosong");
         } else {
             try {
@@ -276,7 +276,7 @@ public class studioMenu extends javax.swing.JInternalFrame {
         String location = locationTextArea.getText();
         String status = statusComboBox.getSelectedItem().toString();
         
-        if(name.equals("") || price.equals("") || desc.equals("") || location.equals("")) {
+        if(name.equals("") || price.equals("")) {
             JOptionPane.showMessageDialog(null, "Data Tidak Boleh Kosong");
         } else {
             try {
