@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
  *
  * @author User
  */
-public class db_connection {
+public class DB_Connection {
     public static Connection connection;
 
     public static Connection configuration_db() throws SQLException {

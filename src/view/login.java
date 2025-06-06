@@ -2,25 +2,25 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package window;
+package view;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
-import database.db_connection;
+import database.DB_Connection;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
  * @author MyBook Hype AMD
  */
-public class login extends javax.swing.JFrame {
+public class Login extends javax.swing.JFrame {
 
     /**
      * Creates new form login
      */
-    public login() {
+    public Login() {
         initComponents();
     }
 
@@ -96,7 +96,7 @@ public class login extends javax.swing.JFrame {
             String userpass = userpassField.getText();
 
             String query = "SELECT * FROM users WHERE name = ?";
-            Connection conn = db_connection.configuration_db();
+            Connection conn = DB_Connection.configuration_db();
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, username);
             ResultSet r = ps.executeQuery();
@@ -117,7 +117,7 @@ public class login extends javax.swing.JFrame {
                 if (BCrypt.checkpw(userpass, correctedHash)) {
                     if (r.getString("role").equals("admin")) {
                         JOptionPane.showMessageDialog(null, "Berhasil Login!");
-                        dashboard dashboardWindow = new dashboard();
+                        Dashboard dashboardWindow = new Dashboard();
                         dashboardWindow.setVisible(true);
                         this.setVisible(false);
                     } else {
@@ -153,20 +153,21 @@ public class login extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new login().setVisible(true);
+                new Login().setVisible(true);
             }
         });
     }

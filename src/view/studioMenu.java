@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
-package window;
+package view;
 
 import javax.swing.table.DefaultTableModel;
-import database.db_connection;
+import database.DB_Connection;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -16,12 +16,12 @@ import javax.swing.JOptionPane;
  *
  * @author MyBook Hype AMD
  */
-public class studioMenu extends javax.swing.JInternalFrame {
+public class StudioMenu extends javax.swing.JInternalFrame {
 
     /**
      * Creates new form karyawanMenu
      */
-    public studioMenu() {
+    public StudioMenu() {
         initComponents();
         view_table();
     }
@@ -230,7 +230,7 @@ public class studioMenu extends javax.swing.JInternalFrame {
                     statusInt = 0;
                 }
                 String query = "INSERT INTO studios (name, price_per_hour, description, location, is_available) VALUES ('"+ name +"', '"+ priceInt +"', '"+ desc +"', '"+ location +"', '"+ statusInt +"')";
-                Connection conn = (Connection)db_connection.configuration_db();
+                Connection conn = (Connection)DB_Connection.configuration_db();
                 PreparedStatement s = conn.prepareStatement(query);
                 s.execute();
                 JOptionPane.showMessageDialog(null, "Tambah Data Berhasil");
@@ -288,7 +288,7 @@ public class studioMenu extends javax.swing.JInternalFrame {
                     statusInt = 0;
                 }
                 String query = "UPDATE studios SET name = '"+ name +"', price_per_hour = '"+ priceInt +"', description = '"+ desc +"', location = '"+ location +"', is_available = '"+ statusInt +"' WHERE id = '"+ id +"'";
-                Connection conn = (Connection)db_connection.configuration_db();
+                Connection conn = (Connection)DB_Connection.configuration_db();
                 PreparedStatement s = conn.prepareStatement(query);
                 s.execute();
                 JOptionPane.showMessageDialog(null, "Ubah Data Berhasil");
@@ -310,7 +310,7 @@ public class studioMenu extends javax.swing.JInternalFrame {
         } else {
             try {
                 String query = "DELETE FROM studios WHERE id = '"+ id +"'";
-                Connection conn = (Connection)db_connection.configuration_db();
+                Connection conn = (Connection)DB_Connection.configuration_db();
                 PreparedStatement s = conn.prepareStatement(query);
                 s.execute();
                 JOptionPane.showMessageDialog(null, "Hapus Data Berhasil");
@@ -342,7 +342,7 @@ public class studioMenu extends javax.swing.JInternalFrame {
         try {
             int counter = 1;
             String query = "SELECT * FROM studios";
-            Connection conn = (Connection)db_connection.configuration_db();
+            Connection conn = (Connection)DB_Connection.configuration_db();
             Statement s = conn.createStatement();
             ResultSet r = s.executeQuery(query);
             while(r.next()) {
