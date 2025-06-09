@@ -4,6 +4,7 @@
  */
 package view;
 
+import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -14,12 +15,21 @@ import model.StudioDAO;
  *
  * @author MyBook Hype AMD
  */
-public class StudioMenu1 extends javax.swing.JInternalFrame {
+public class StudioMenu extends javax.swing.JInternalFrame {
 
     /**
-     * Creates new form karyawanMenu
+     * Creates new form StudioMenu
      */
-    public StudioMenu1() {
+    private StudioDAO dao;
+    private static final String[] COLUMN_NAMES = {"No.", "ID", "Name", "Location", "Description", "Price", "Availability"};
+    
+    public StudioMenu() {
+        try {
+            dao = new StudioDAO();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage());
+        }
+        
         initComponents();
         loadStudios();
     }
@@ -210,74 +220,85 @@ public class StudioMenu1 extends javax.swing.JInternalFrame {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         // TODO add your handling code here:
-        String name = nameField.getText();
-        String location = locationTextArea.getText();
-        String description = descTextArea.getText();
-        double price = Double.parseDouble(priceField.getText());
-        boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
-        
         try {
+            String name = nameField.getText();
+            String location = locationTextArea.getText();
+            String description = descTextArea.getText();
+            double price = Double.parseDouble(priceField.getText());
+            boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
+            
             Studio studio = new Studio(name, location, description, price, available);
-            StudioDAO dao = new StudioDAO();
-            dao.insertStudio(studio);
-            JOptionPane.showMessageDialog(this, "Studio added successfully!");
-            loadStudios();
-            clearFields();
+            if(dao.insertStudio(studio)) {
+                JOptionPane.showMessageDialog(this, "Studio added successfully!");
+                loadStudios();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to add studio.");
+            }
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(this, "Failed to add studio.");
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void studioTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_studioTableMouseClicked
         // TODO add your handling code here:
-        int selectedRow = studioTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            idField.setText(studioTable.getValueAt(selectedRow, 1).toString());
-            nameField.setText(studioTable.getValueAt(selectedRow, 2).toString());
-            locationTextArea.setText(studioTable.getValueAt(selectedRow, 3).toString());
-            descTextArea.setText(studioTable.getValueAt(selectedRow, 4).toString());
-            priceField.setText(studioTable.getValueAt(selectedRow, 5).toString());
-            statusComboBox.setSelectedItem(studioTable.getValueAt(selectedRow, 6).toString());
+        try {
+            int selectedRow = studioTable.getSelectedRow();
+            int studioID = Integer.parseInt(studioTable.getValueAt(selectedRow, 1).toString());
+
+            Studio studio = dao.getStudioById(studioID);
+
+            if (studio != null) {
+                idField.setText(String.valueOf(studio.getId()));
+                nameField.setText(studio.getName());
+                locationTextArea.setText(studio.getLocation());
+                descTextArea.setText(studio.getDescription());
+                priceField.setText(String.valueOf(studio.getPricePerHour()));
+                statusComboBox.setSelectedItem(studio.isAvailable() ? "Active" : "Inactive");
+            }
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_studioTableMouseClicked
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         // TODO add your handling code here:
-        int id = Integer.parseInt(idField.getText());
-        String name = nameField.getText();
-        String location = locationTextArea.getText();
-        String description = descTextArea.getText();
-        double price = Double.parseDouble(priceField.getText());
-        boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
-        
         try {
+            int id = Integer.parseInt(idField.getText());
+            String name = nameField.getText();
+            String location = locationTextArea.getText();
+            String description = descTextArea.getText();
+            double price = Double.parseDouble(priceField.getText());
+            boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
+
             Studio studio = new Studio(id, name, location, description, price, available);
-            StudioDAO dao = new StudioDAO();
-            dao.updateStudio(studio);
-            JOptionPane.showMessageDialog(this, "Studio updated!");
-            loadStudios();
-            clearFields();
+            if(dao.updateStudio(studio)) {
+                JOptionPane.showMessageDialog(this, "Studio updated!");
+                loadStudios();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Update failed.");
+            }
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(this, "Update failed.");
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        int id = Integer.parseInt(idField.getText());
-        
         try {
-            StudioDAO dao = new StudioDAO();
-            dao.deleteStudio(id);
-            JOptionPane.showMessageDialog(this, "Studio deleted!");
-            loadStudios();
-            clearFields();
+            int id = Integer.parseInt(idField.getText());
+
+            if(dao.deleteStudio(id)) {
+                JOptionPane.showMessageDialog(this, "Studio deleted!");
+                loadStudios();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Delete failed.");
+            }
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(this, "Delete failed.");
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        }
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        } 
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
@@ -287,16 +308,14 @@ public class StudioMenu1 extends javax.swing.JInternalFrame {
 
     
     private void loadStudios() {
-        String[] columnNames = {"No.", "ID", "Name", "Location", "Description", "Price", "Availability"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        studioTable.setModel(tableModel);
-        
         try {
+            DefaultTableModel tableModel = new DefaultTableModel(COLUMN_NAMES, 0);
+            studioTable.setModel(tableModel);
+        
             int counter = 1;
             tableModel.setRowCount(0); // kosongkan tabel dulu
 
-            StudioDAO studioDAO = new StudioDAO();
-            List<Studio> studios = studioDAO.getAllStudios();
+            List<Studio> studios = dao.getAllStudios();
 
             for (Studio studio : studios) {
                 Object[] row = new Object[]{

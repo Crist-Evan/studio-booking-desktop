@@ -14,9 +14,9 @@ import database.DB_Connection;
  *
  * @author MyBook Hype AMD
  */
-public class StudioDAO {
+public class StudioDAO{
 
-    private Connection conn;
+    private static Connection conn;
 
     public StudioDAO() throws SQLException {
         conn = DB_Connection.configuration_db(); // menggunakan DB_Connection.java yang kamu upload

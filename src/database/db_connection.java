@@ -24,10 +24,10 @@ public class DB_Connection {
 
             connection = DriverManager.getConnection(url_host, nama_user, password_db);
 
-            System.out.println("Database berhasil terhubung");
+            System.out.println("Database successfully connected");
             //JOptionPane.showMessageDialog(null, "Selamat, terhubung");
         } catch (Exception e) {
-            System.out.println("Database gagal terhubung");
+            System.out.println("Database failed to connect");
             //JOptionPane.showMessageDialog(null, "Gagal terhubung: " + e.getMessage());
         }
 

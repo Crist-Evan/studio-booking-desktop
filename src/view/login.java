@@ -108,7 +108,7 @@ public class Login extends javax.swing.JFrame {
 
                 // tanpa hash
 //                if (r.getString("password").equals(userpass)) {
-//                    JOptionPane.showMessageDialog(null, "Berhasil Login!");
+//                    JOptionPane.showMessageDialog(null, "Login successfully!");
 //                    dashboard dashboardWindow = new dashboard();
 //                    dashboardWindow.setVisible(true);
 //                    this.setVisible(false);
@@ -116,18 +116,18 @@ public class Login extends javax.swing.JFrame {
                 
                 if (BCrypt.checkpw(userpass, correctedHash)) {
                     if (r.getString("role").equals("admin")) {
-                        JOptionPane.showMessageDialog(null, "Berhasil Login!");
+                        JOptionPane.showMessageDialog(null, "Login successfully!");
                         Dashboard dashboardWindow = new Dashboard();
                         dashboardWindow.setVisible(true);
                         this.setVisible(false);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Hanya untuk admin!");
+                        JOptionPane.showMessageDialog(null, "Only admin!");
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Password salah!");
+                    JOptionPane.showMessageDialog(null, "Wrong password!");
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Username tidak ditemukan!");
+                JOptionPane.showMessageDialog(null, "User not found!");
             }
 
             conn.close();

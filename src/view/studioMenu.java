@@ -4,13 +4,12 @@
  */
 package view;
 
+import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
-import database.DB_Connection;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
+import java.util.List;
 import javax.swing.JOptionPane;
+import model.Studio;
+import model.StudioDAO;
 
 /**
  *
@@ -19,11 +18,20 @@ import javax.swing.JOptionPane;
 public class StudioMenu extends javax.swing.JInternalFrame {
 
     /**
-     * Creates new form karyawanMenu
+     * Creates new form StudioMenu
      */
+    private StudioDAO dao;
+    private static final String[] COLUMN_NAMES = {"No.", "ID", "Name", "Location", "Description", "Price", "Availability"};
+    
     public StudioMenu() {
+        try {
+            dao = new StudioDAO();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage());
+        }
+        
         initComponents();
-        view_table();
+        loadStudios();
     }
 
     /**
@@ -212,157 +220,121 @@ public class StudioMenu extends javax.swing.JInternalFrame {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         // TODO add your handling code here:
-        String name = nameField.getText();
-        String price = priceField.getText();
-        String desc = descTextArea.getText();
-        String location = locationTextArea.getText();
-        String status = statusComboBox.getSelectedItem().toString();
-        
-        if(name.equals("") || price.equals("")) {
-            JOptionPane.showMessageDialog(null, "Data Tidak Boleh Kosong");
-        } else {
-            try {
-                int priceInt = Integer.parseInt(price);
-                int statusInt;
-                if(status.equals("Active")) {
-                    statusInt = 1;
-                } else {
-                    statusInt = 0;
-                }
-                String query = "INSERT INTO studios (name, price_per_hour, description, location, is_available) VALUES ('"+ name +"', '"+ priceInt +"', '"+ desc +"', '"+ location +"', '"+ statusInt +"')";
-                Connection conn = (Connection)DB_Connection.configuration_db();
-                PreparedStatement s = conn.prepareStatement(query);
-                s.execute();
-                JOptionPane.showMessageDialog(null, "Tambah Data Berhasil");
-            } catch(Exception e) {
-                JOptionPane.showMessageDialog(null, "Tambah Data Gagal");
-                JOptionPane.showMessageDialog(this, e.getMessage());
+        try {
+            String name = nameField.getText();
+            String location = locationTextArea.getText();
+            String description = descTextArea.getText();
+            double price = Double.parseDouble(priceField.getText());
+            boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
+            
+            Studio studio = new Studio(name, location, description, price, available);
+            if(dao.insertStudio(studio)) {
+                JOptionPane.showMessageDialog(this, "Studio added successfully!");
+                loadStudios();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to add studio.");
             }
-            view_table();
-            clear_field();
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void studioTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_studioTableMouseClicked
         // TODO add your handling code here:
-        int row = studioTable.rowAtPoint(evt.getPoint());
-        
-        String id = studioTable.getValueAt(row, 1).toString();
-        idField.setText(id);
-        
-        String name = studioTable.getValueAt(row, 2).toString();
-        nameField.setText(name);
-        
-        String price = studioTable.getValueAt(row, 3).toString();
-        price = price.replace(".00", "");
-        priceField.setText(price);
-        
-        String desc = studioTable.getValueAt(row, 4).toString();
-        descTextArea.setText(desc);
-        
-        String location = studioTable.getValueAt(row, 5).toString();
-        locationTextArea.setText(location);
-        
-        String status = studioTable.getValueAt(row, 6).toString();
-        statusComboBox.setSelectedItem(status);
+        try {
+            int selectedRow = studioTable.getSelectedRow();
+            int studioID = Integer.parseInt(studioTable.getValueAt(selectedRow, 1).toString());
+
+            Studio studio = dao.getStudioById(studioID);
+
+            if (studio != null) {
+                idField.setText(String.valueOf(studio.getId()));
+                nameField.setText(studio.getName());
+                locationTextArea.setText(studio.getLocation());
+                descTextArea.setText(studio.getDescription());
+                priceField.setText(String.valueOf(studio.getPricePerHour()));
+                statusComboBox.setSelectedItem(studio.isAvailable() ? "Active" : "Inactive");
+            }
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
     }//GEN-LAST:event_studioTableMouseClicked
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         // TODO add your handling code here:
-        String id = idField.getText();
-        String name = nameField.getText();
-        String price = priceField.getText();
-        String desc = descTextArea.getText();
-        String location = locationTextArea.getText();
-        String status = statusComboBox.getSelectedItem().toString();
-        
-        if(name.equals("") || price.equals("")) {
-            JOptionPane.showMessageDialog(null, "Data Tidak Boleh Kosong");
-        } else {
-            try {
-                int priceInt = Integer.parseInt(price);
-                int statusInt;
-                if(status.equals("Active")) {
-                    statusInt = 1;
-                } else {
-                    statusInt = 0;
-                }
-                String query = "UPDATE studios SET name = '"+ name +"', price_per_hour = '"+ priceInt +"', description = '"+ desc +"', location = '"+ location +"', is_available = '"+ statusInt +"' WHERE id = '"+ id +"'";
-                Connection conn = (Connection)DB_Connection.configuration_db();
-                PreparedStatement s = conn.prepareStatement(query);
-                s.execute();
-                JOptionPane.showMessageDialog(null, "Ubah Data Berhasil");
-            } catch(Exception e) {
-                JOptionPane.showMessageDialog(null, "Ubah Data Gagal");
-                JOptionPane.showMessageDialog(this, e.getMessage());
+        try {
+            int id = Integer.parseInt(idField.getText());
+            String name = nameField.getText();
+            String location = locationTextArea.getText();
+            String description = descTextArea.getText();
+            double price = Double.parseDouble(priceField.getText());
+            boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
+
+            Studio studio = new Studio(id, name, location, description, price, available);
+            if(dao.updateStudio(studio)) {
+                JOptionPane.showMessageDialog(this, "Studio updated!");
+                loadStudios();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Update failed.");
             }
-            view_table();
-            clear_field();
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-        String id = idField.getText();
-        
-        if(id.equals("ID")) {
-            JOptionPane.showMessageDialog(null, "Pilih Datanya");
-        } else {
-            try {
-                String query = "DELETE FROM studios WHERE id = '"+ id +"'";
-                Connection conn = (Connection)DB_Connection.configuration_db();
-                PreparedStatement s = conn.prepareStatement(query);
-                s.execute();
-                JOptionPane.showMessageDialog(null, "Hapus Data Berhasil");
-            } catch(Exception e) {
-                JOptionPane.showMessageDialog(null, "Hapus Data Gagal");
-                JOptionPane.showMessageDialog(this, e.getMessage());
+        try {
+            int id = Integer.parseInt(idField.getText());
+
+            if(dao.deleteStudio(id)) {
+                JOptionPane.showMessageDialog(this, "Studio deleted!");
+                loadStudios();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Delete failed.");
             }
-            view_table();
-            clear_field();
-        }
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        } 
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         // TODO add your handling code here:
-        clear_field();
+        clearFields();
     }//GEN-LAST:event_resetButtonActionPerformed
 
     
-    private void view_table() {
-        DefaultTableModel tb = new DefaultTableModel();
-        tb.addColumn("No.");
-        tb.addColumn("ID");
-        tb.addColumn("Name");
-        tb.addColumn("Price / Hr");
-        tb.addColumn("Desc");
-        tb.addColumn("Location");
-        tb.addColumn("Status");
-        
+    private void loadStudios() {
         try {
+            DefaultTableModel tableModel = new DefaultTableModel(COLUMN_NAMES, 0);
+            studioTable.setModel(tableModel);
+        
             int counter = 1;
-            String query = "SELECT * FROM studios";
-            Connection conn = (Connection)DB_Connection.configuration_db();
-            Statement s = conn.createStatement();
-            ResultSet r = s.executeQuery(query);
-            while(r.next()) {
-                String studioStatus;
-                if(r.getString(6).equals("1")) {
-                    studioStatus = "Active";
-                } else {
-                    studioStatus = "Inactive";
-                }
-                tb.addRow(new Object[] {
-                    counter++, r.getString(1), r.getString(2), r.getString(5), r.getString(4), r.getString(3), studioStatus
-                });
+            tableModel.setRowCount(0); // kosongkan tabel dulu
+
+            List<Studio> studios = dao.getAllStudios();
+
+            for (Studio studio : studios) {
+                Object[] row = new Object[]{
+                    counter++,
+                    studio.getId(),
+                    studio.getName(),
+                    studio.getLocation(),
+                    studio.getDescription(),
+                    studio.getPricePerHour(),
+                    studio.isAvailable() ? "Active" : "Inactive"
+                };
+                tableModel.addRow(row);
             }
-            studioTable.setModel(tb);
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(this, "Gagal memuat data: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed: " + e.getMessage());
         }
     }
     
-    private void clear_field() {
+    private void clearFields() {
         idField.setText("ID");
         nameField.setText("");
         priceField.setText("");
