@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import javax.swing.JOptionPane;
+import model.DAO;
 import model.Studio;
 import model.StudioDAO;
 
@@ -20,7 +21,7 @@ public class StudioMenu extends javax.swing.JInternalFrame {
     /**
      * Creates new form StudioMenu
      */
-    private StudioDAO dao;
+    private DAO<Studio> dao;
     private static final String[] COLUMN_NAMES = {"No.", "ID", "Name", "Location", "Description", "Price", "Availability"};
     
     public StudioMenu() {
@@ -228,7 +229,7 @@ public class StudioMenu extends javax.swing.JInternalFrame {
             boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
             
             Studio studio = new Studio(name, location, description, price, available);
-            if(dao.insertStudio(studio)) {
+            if(dao.insert(studio)) {
                 JOptionPane.showMessageDialog(this, "Studio added successfully!");
                 loadStudios();
                 clearFields();
@@ -246,7 +247,7 @@ public class StudioMenu extends javax.swing.JInternalFrame {
             int selectedRow = studioTable.getSelectedRow();
             int studioID = Integer.parseInt(studioTable.getValueAt(selectedRow, 1).toString());
 
-            Studio studio = dao.getStudioById(studioID);
+            Studio studio = dao.getById(studioID);
 
             if (studio != null) {
                 idField.setText(String.valueOf(studio.getId()));
@@ -272,7 +273,7 @@ public class StudioMenu extends javax.swing.JInternalFrame {
             boolean available = statusComboBox.getSelectedItem().toString().equals("Active");
 
             Studio studio = new Studio(id, name, location, description, price, available);
-            if(dao.updateStudio(studio)) {
+            if(dao.update(studio)) {
                 JOptionPane.showMessageDialog(this, "Studio updated!");
                 loadStudios();
                 clearFields();
@@ -289,7 +290,7 @@ public class StudioMenu extends javax.swing.JInternalFrame {
         try {
             int id = Integer.parseInt(idField.getText());
 
-            if(dao.deleteStudio(id)) {
+            if(dao.delete(id)) {
                 JOptionPane.showMessageDialog(this, "Studio deleted!");
                 loadStudios();
                 clearFields();
@@ -315,7 +316,7 @@ public class StudioMenu extends javax.swing.JInternalFrame {
             int counter = 1;
             tableModel.setRowCount(0); // kosongkan tabel dulu
 
-            List<Studio> studios = dao.getAllStudios();
+            List<Studio> studios = dao.getAll();
 
             for (Studio studio : studios) {
                 Object[] row = new Object[]{

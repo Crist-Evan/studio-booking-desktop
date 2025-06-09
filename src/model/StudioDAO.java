@@ -14,16 +14,15 @@ import database.DB_Connection;
  *
  * @author MyBook Hype AMD
  */
-public class StudioDAO{
-
-    private static Connection conn;
+public class StudioDAO extends BaseDAO<Studio> {
 
     public StudioDAO() throws SQLException {
-        conn = DB_Connection.configuration_db(); // menggunakan DB_Connection.java yang kamu upload
+        conn = DB_Connection.configuration_db();
     }
-
+    
     // CREATE
-    public boolean insertStudio(Studio studio) {
+    @Override
+    public boolean insert(Studio studio) {
         String sql = "INSERT INTO studios (name, location, description, price_per_hour, is_available) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, studio.getName());
@@ -40,7 +39,8 @@ public class StudioDAO{
     }
 
     // READ ALL
-    public List<Studio> getAllStudios() {
+    @Override
+    public List<Studio> getAll() {
         List<Studio> list = new ArrayList<>();
         String sql = "SELECT * FROM studios";
         try (Statement stmt = conn.createStatement();
@@ -63,7 +63,8 @@ public class StudioDAO{
     }
 
     // UPDATE
-    public boolean updateStudio(Studio studio) {
+    @Override
+    public boolean update(Studio studio) {
         String sql = "UPDATE studios SET name=?, location=?, description=?, price_per_hour=?, is_available=? WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, studio.getName());
@@ -81,7 +82,8 @@ public class StudioDAO{
     }
 
     // DELETE
-    public boolean deleteStudio(int id) {
+    @Override
+    public boolean delete(int id) {
         String sql = "DELETE FROM studios WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -94,7 +96,8 @@ public class StudioDAO{
     }
 
     // GET BY ID
-    public Studio getStudioById(int id) {
+    @Override
+    public Studio getById(int id) {
         String sql = "SELECT * FROM studios WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
