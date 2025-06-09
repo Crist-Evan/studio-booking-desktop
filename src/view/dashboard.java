@@ -86,7 +86,7 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
         // TODO add your handling code here:
-        int option = JOptionPane.showConfirmDialog(null, "Yakin?", "Perhatian", JOptionPane.YES_NO_OPTION);
+        int option = JOptionPane.showConfirmDialog(null, "Are you sure?", "Warning", JOptionPane.YES_NO_OPTION);
         if(option == 0) {
             Login loginWindow = new Login();
             loginWindow.setVisible(true);
